@@ -1,0 +1,60 @@
+- name: install ruby
+  apt: name={{item}} default_release=testing state=latest
+  with_items:
+    - ruby2.3
+    - ruby-dev
+    - bundler
+    - ruby-rack
+
+- name: install other required software
+  apt: name={{item}}  state=latest
+  with_items:
+    - git
+    - zlib1g-dev
+    - libsqlite3-dev
+    - sqlite
+    - imagemagick
+
+- name: create directory
+  file: path="{{dest}}" state=directory recurse=yes owner=www-data
+    group=www-data mode=0775
+
+- name: clone git
+  git:
+    repo: "{{git_source}}"
+    dest: "{{dest}}"
+    force: yes
+  become: true
+  become_user: www-data
+  become_method: sudo
+#    update: yes
+#    version: deploy
+
+#- name: chown bundler and other directories
+#  file: path="{{item}}" state=directory recurse=no group=www-data mode=0775
+#  with_items:
+#    - "{{dest}}/db"
+#    - "{{dest}}/log"
+#    - "{{dest}}/config"
+#    - "{{dest}}/tmp"
+#    - "{{dest}}/vendor"
+##    - "{{dest}}/public/system"
+
+# - name: balooning Memory to 
+
+- name: make bundler home
+  file: path=/var/www state=directory owner=www-data group=www-data
+
+- name: run bundler
+  bundler: state=present chdir="{{dest}}" deployment_mode=True
+  become: true
+  become_user: www-data
+  become_method: sudo
+
+- name: run migrations
+  command: "rake db:migrate RAILS_ENV=production chdir={{dest}}"
+  register: rake_migrate
+  become: true
+  become_user: www-data
+  become_method: sudo
+  changed_when: rake_migrate.stdout_lines | length > 1

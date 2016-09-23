@@ -1,0 +1,33 @@
+- name: generate TLS key
+  command: openssl genrsa -out {{ key_path }} {{ key_size}}
+  args:
+    creates: "{{key_path}}"
+  register: apache2_keygen
+
+- name: set permissions on private key
+  file: 
+    path: "{{key_path}}"
+    state: file
+    mode: 0640
+    owner: root
+    group: ssl-cert
+
+- name: generate openssl configuration
+  template:
+    src: openssl.cnf.j2
+    dest: /etc/ssl/apache-openssl-altname.cnf
+    backup: yes
+  register: apache2_sslconfgen
+
+- name: remove old certificate
+  file: 
+    path: "{{cert_path}}"
+    state: absent
+  when: apache2_keygen.changed or apache2_sslconfgen.changed
+
+- name: generate selfsigned certificate
+  command: openssl req -config {{cert_conf}} -new -x509 -key {{key_path}} -out {{cert_path}} -days 365 -subj "/C=de/ST=North Rhine-Westphalia/L=Wuppertal/O=devtal.de/OU=in/CN={{inventory_hostname}}/" 
+  args: 
+    creates: "{{cert_path}}"
+  notify:
+    - restart daemons

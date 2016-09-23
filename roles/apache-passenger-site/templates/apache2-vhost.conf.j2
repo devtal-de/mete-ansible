@@ -1,0 +1,64 @@
+<VirtualHost *:80>
+	ServerAdmin	thoto@devtal.de
+	ServerName	{{site_fqdn}}
+	Redirect	permanent / https://{{site_fqdn}}/
+
+	ErrorLog	${APACHE_LOG_DIR}/error.log
+	LogLevel	warn
+	CustomLog	${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+<VirtualHost *:443>
+	ServerAdmin		thoto@devtal.de
+	ServerName		{{site_fqdn}}
+	DocumentRoot	{{site_path}}
+
+# 	PassengerAppRoot {{app_path}}
+# 	PassengerBaseURI /
+	<Directory {{app_path}}>
+		Options +FollowSymLinks -MultiViews
+		Require all granted
+	</Directory>
+
+	<Directory {{site_path}}>
+		Options +FollowSymLinks -MultiViews
+		Require all granted
+	</Directory>
+
+	ErrorLog	${APACHE_LOG_DIR}/error.log
+	LogLevel	warn
+	CustomLog	${APACHE_LOG_DIR}/access.log combined
+
+	SSLEngine				on
+	SSLCertificateFile		{{apache['cert_path']}}
+	SSLCertificateKeyFile	{{apache['key_path']}}
+{% if 'ca_cert_path' in apache %}
+	SSLCertificateChainFile	{{apache['ca_cert_path']}}
+{% endif %}
+
+{% if 'cert_path' in apache %}
+	# stuff
+{% endif %}
+{% if 'client_ca_path' in apache %}
+	SSLCACertificatePath	{{apache['client_ca_path']}}
+{% endif %}
+{% if 'client_ca_file' in apache %}
+	SSLCACertificateFile	{{apache['client_ca_file']}}
+{% endif %}
+{% if 'client_crl_path' in apache %}
+	SSLCARevocationPath		{{apache['client_crl_path']}}
+{% endif %}
+{% if 'client_crl_file' in apache %}
+	SSLCARevocationFile		{{apache['client_rl_file']}}
+{% endif %}
+
+	<FilesMatch "\.(cgi|shtml|phtml|php)$">
+		SSLOptions +StdEnvVars
+	</FilesMatch>
+{% if enable_cgi|default(false,true) %}
+	<Directory /usr/lib/cgi-bin>
+		SSLOptions +StdEnvVars
+	</Directory>
+{% endif %}
+</VirtualHost>
+# vim: syntax=apache ts=4 sw=4

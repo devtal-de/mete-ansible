@@ -1,0 +1,3 @@
+- name: restart daemons
+  service: name={{item}} state=restarted
+  with_items: "{{daemons}}"

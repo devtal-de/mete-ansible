@@ -1,0 +1,37 @@
+---
+- hosts: serviceding.in.devtal.de
+  vars: 
+    mete_dir: /srv/http/mete
+    mete_hostname: mete.in.devtal.de
+    altnames:
+      - '{{mete_hostname}}'
+    apache_conf:
+      default_dir: /srv/http/www
+      cert_path: /etc/ssl/certs/apache2-default.crt
+      key_path: /etc/ssl/private/apache2-default.key
+      key_size: 8192
+#      ca_cert_path: /etc/ssl/certs/apache2-default-ca.crt
+  roles:
+    - role: debian-common
+      upgrade_unattended: false
+      mirror: "http://ftp.halifax.rwth-aachen.de/debian/"
+    - role: cert
+      cert_path: "{{apache_conf['cert_path']}}"
+      cert_conf: /etc/ssl/apache-openssl-altname.cnf
+      key_path: "{{apache_conf['key_path']}}"
+      key_size: "{{apache_conf['key_size']}}"
+      daemons: [ "apache2" ]
+    - { role: apache-basic, apache: '{{ apache_conf }}' }
+    - role: mete
+      git_source: https://github.com/chaosdorf/mete.git
+      dest: "{{mete_dir}}"
+    - role: apache-passenger-site
+      apache: '{{ apache_conf }}'
+      site_fqdn: '{{mete_hostname}}'
+      app_path: '{{mete_dir}}'
+      site_path: '{{mete_dir}}/public'
+      site_short: 'mete'
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted

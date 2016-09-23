@@ -1,0 +1,41 @@
+- name: install Apache
+  apt: name=apache2 state=latest
+
+- name: enable apache ssl module
+  apache2_module: name=ssl state=present
+  notify:
+    - restart apache2
+
+- name: disable 000-default
+  command: a2dissite 000-default
+  register: result
+  changed_when: result.stdout.find('already')==-1
+
+- name: create new default dir
+  debug: msg="{{apache | to_nice_json}}"
+
+- name: create new default dir new
+  file: 
+    path: "{{apache['default_dir']}}"
+    state: directory 
+    mode: 0755
+    owner: root
+    group: root
+
+- name: link apache2 default config before templating
+  file: 
+    path: /etc/apache2/sites-enabled/000-default-new.conf
+    src: /etc/apache2/sites-available/default.conf
+    state: link
+    force: yes
+
+- name: copy apache2 default configuration
+  template:
+    src: apache2-site-default.j2
+    dest: /etc/apache2/sites-available/default.conf
+    backup: yes
+#   validate: "/bin/bash -c 'apachectl configtest # %s'"
+  notify:
+    - restart apache2
+
+

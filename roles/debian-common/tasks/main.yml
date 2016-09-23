@@ -1,0 +1,26 @@
+- name: install common packages
+  apt: name={{item}} state=present
+  with_items: [ vim, screen, less, tcpdump, strace, iotop, htop, iptraf-ng,
+     rsync, iptables ]
+
+- name: install unattended-upgrades 
+  apt: name=unattended-upgrades state=present
+  when: upgrade_unattended
+
+- name: install stable as default release
+  copy: 
+    src: conf-default-release
+    dest: /etc/apt/apt.conf.d/80default-release
+
+- name: pin testing
+  copy: 
+    src: pref-testing
+    dest: /etc/apt/preferences.d/testing
+
+- name: add testing repo
+  template:
+    src: testing-sources.list.j2
+    dest: /etc/apt/sources.list.d/testing.list
+
+- name: update cache
+  apt: update_cache=yes

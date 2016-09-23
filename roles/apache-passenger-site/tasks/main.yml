@@ -1,0 +1,38 @@
+- name: install apt https transport
+  apt: name=apt-transport-https state=present
+
+- name: add apt key for passenger
+  apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=561F9B9CAC40B2F7
+
+- name: add apt repo for passenger
+  apt_repository: 
+    repo: 'deb https://oss-binaries.phusionpassenger.com/apt/passenger jessie main' 
+    state: present
+    filename: passenger
+
+- name: install ruby rack from testing
+  apt: name={{item}} state=present default_release=testing
+  with_items:
+    - ruby-rack
+
+- name: install passenger from testing
+  apt: name={{item}} state=present default_release="l=passenger"
+  with_items:
+    - libapache2-mod-passenger
+
+- name: enable passenger module in apache
+  apache2_module: name=passenger state=present
+  notify: restart apache2
+
+- name: upload apache vhost configuration
+  template:
+    src: apache2-vhost.conf.j2
+    dest: /etc/apache2/sites-available/{{site_short}}.conf
+  notify: restart apache2
+
+- name: enable apache vhost configuration
+  file: 
+    path: /etc/apache2/sites-enabled/{{site_short}}.conf
+    src: /etc/apache2/sites-available/{{site_short}}.conf
+    state: link
+  notify: restart apache2
