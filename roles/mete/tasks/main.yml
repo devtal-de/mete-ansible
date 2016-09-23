@@ -16,8 +16,7 @@
     - imagemagick
 
 - name: create directory
-  file: path="{{dest}}" state=directory recurse=yes owner=www-data
-    group=www-data mode=0775
+  file: path="{{dest}}" state=directory owner=www-data group=www-data mode=0775
 
 - name: clone git
   git:
