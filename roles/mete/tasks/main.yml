@@ -51,6 +51,14 @@
   become_user: www-data
   become_method: sudo
 
+- name: precompile assets for production
+  command: "rake assets:precompile RAILS_ENV=production chdir={{dest}}"
+  register: rake_precompile
+  become: true
+  become_user: www-data
+  become_method: sudo
+  changed_when: rake_precompile.stdout_lines | length > 1
+
 - name: run migrations
   command: "rake db:migrate RAILS_ENV=production chdir={{dest}}"
   register: rake_migrate
