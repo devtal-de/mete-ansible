@@ -24,6 +24,12 @@
   apache2_module: name=passenger state=present
   notify: restart apache2
 
+- name: upload passenger module configuration
+  template:
+    src: passenger.conf.j2
+    dest: /etc/apache2/mods-available/passenger.conf
+  notify: restart apache2
+
 - name: upload apache vhost configuration
   template:
     src: apache2-vhost.conf.j2
