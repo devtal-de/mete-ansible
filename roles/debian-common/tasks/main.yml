@@ -1,7 +1,7 @@
 - name: install common packages
   apt: name={{item}} state=present
   with_items: [ vim, screen, less, tcpdump, strace, iotop, htop, iptraf-ng,
-     rsync, iptables ]
+    rsync, iptables, iptables-persistent ]
 
 - name: install unattended-upgrades 
   apt: name=unattended-upgrades state=present

@@ -1,3 +1,10 @@
+- name: install openssl and ca-certificates
+  apt: name={{item}} state=present
+  with_items:
+    - openssl
+    - ca-certificates
+    - ssl-cert
+
 - name: generate TLS key
   command: openssl genrsa -out {{ key_path }} {{ key_size}}
   args:
