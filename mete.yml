@@ -23,7 +23,8 @@
       daemons: [ "apache2" ]
     - { role: apache-basic, apache: '{{ apache_conf }}' }
     - role: mete
-      git_source: https://github.com/devtal-de/mete.git
+      git_source: "https://github.com/devtal-de/mete.git"
+      git_branch: "dt-deploy"
       dest: "{{mete_dir}}"
     - role: apache-passenger-site
       apache: '{{ apache_conf }}'

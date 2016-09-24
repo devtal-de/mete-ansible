@@ -22,6 +22,7 @@
   git:
     repo: "{{git_source}}"
     dest: "{{dest}}"
+    version: "{{git_branch}}"
     force: yes
   become: true
   become_user: www-data
