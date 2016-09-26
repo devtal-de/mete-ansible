@@ -1,0 +1,13 @@
+mete_dir: /srv/http/mete
+mete_hostname: mete.in.devtal.de
+debian_mirror: "http://ftp.halifax.rwth-aachen.de/debian/"
+altnames:
+  - '{{mete_hostname}}'
+apache_conf:
+  default_dir: /srv/http/www
+  cert_path: /etc/ssl/certs/apache2-default.crt
+  key_path: /etc/ssl/private/apache2-default.key
+  key_size: 8192
+git_source: "https://github.com/devtal-de/mete.git"
+git_branch: "dt-deploy"
+#  ca_cert_path: /etc/ssl/certs/apache2-default-ca.crt
