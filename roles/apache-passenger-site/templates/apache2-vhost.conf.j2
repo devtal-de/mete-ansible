@@ -17,6 +17,9 @@
 # 	PassengerBaseURI /
 	PassengerAppEnv			{{site_env|default('production')}}
 
+{% for i in passenger_env %}
+	SetEnv {{ i.split('=',1)[0] }} {{ i.split('=',1)[1] }}
+{% endfor %}
 	<Directory {{app_path}}>
 		Options +FollowSymLinks -MultiViews
 		Require all granted

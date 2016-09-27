@@ -2,6 +2,7 @@
 - hosts: serviceding.in.devtal.de
   vars_files:
   - vars/main.yml
+  - vars/twitter.yml
   roles:
     - role: debian-common
       upgrade_unattended: false
@@ -16,6 +17,7 @@
     - role: mete
       dest: "{{mete_dir}}"
     - role: apache-passenger-site
+      passenger_env: '{{twitter_env}}'
       apache: '{{ apache_conf }}'
       site_fqdn: '{{mete_hostname}}'
       app_path: '{{mete_dir}}'
