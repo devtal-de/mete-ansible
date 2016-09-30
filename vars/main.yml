@@ -5,6 +5,7 @@ altnames:
   - '{{mete_hostname}}'
 apache_conf:
   default_dir: /srv/http/www
+  ca_cert_path: /etc/ssl/certs/apache2-default.crt
   cert_path: /etc/ssl/certs/apache2-default.crt
   key_path: /etc/ssl/private/apache2-default.key
   key_size: 8192

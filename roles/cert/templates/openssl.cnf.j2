@@ -3,6 +3,7 @@ default_bits			= {{key_size}}
 req_extensions			= v3_req
 x509_extensions			= v3_req
 distinguished_name		= subject
+basicConstraints		= critical,CA:true,pathlen:1
 
 
 [ subject ]
@@ -14,8 +15,9 @@ OU=in
 CN={{inventory_hostname}}
 
 [ v3_req ]
-basicConstraints = CA:FALSE
-keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+basicConstraints	= critical,CA:true,pathlen:1
+keyUsage			= critical, nonRepudiation, digitalSignature, \
+						keyEncipherment, keyCertSign
 subjectAltName=@alt_names
 
 [ alt_names ]
@@ -23,4 +25,4 @@ DNS.1 = {{inventory_hostname}}
 {% for i in altnames %}
 DNS.{{loop.index+1}} = {{i}}
 {% endfor %}
-
+# vim: ts=4 sw=4
