@@ -27,6 +27,7 @@
   become: true
   become_user: www-data
   become_method: sudo
+  notify: restart apache2
 #    update: yes
 #    version: deploy
 
